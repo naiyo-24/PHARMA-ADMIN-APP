@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 sealed class AppTheme {
-  static const String fontFamily = 'Fraunces';
+  static const String fontFamily = 'BricolageGrotesque';
 
   static const double _corner = 16;
   static const double _cornerSmall = 12;
