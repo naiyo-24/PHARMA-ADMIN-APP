@@ -35,6 +35,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
+  go_router: ^17.1.0
+  flutter_riverpod: ^3.3.1
+  iconsax_flutter: ^1.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -64,12 +68,10 @@ flutter:
     - assets/font/
 
   fonts:
-    - family: Fraunces
+    - family: BricolageGrotesque
       fonts:
-        - asset: 'assets/font/Fraunces-VariableFont_SOFT,WONK,opsz,wght.ttf'
-        - asset: 'assets/font/Fraunces-Italic-VariableFont_SOFT,WONK,opsz,wght.ttf'
-          style: italic
-
+        - asset: assets/font/BricolageGrotesque-VariableFont_opsz,wdth,wght.ttf
+        
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

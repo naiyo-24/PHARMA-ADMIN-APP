@@ -74,6 +74,10 @@ sealed class AppTheme {
     );
 
     return base.copyWith(
+      iconTheme: IconThemeData(
+        color: scheme.onSurface.withAlpha(217),
+        size: 20,
+      ),
       dividerTheme: DividerThemeData(
         color: scheme.outline.withAlpha(153),
         thickness: 1,
@@ -82,6 +86,7 @@ sealed class AppTheme {
       appBarTheme: AppBarTheme(
         backgroundColor: scheme.surface,
         foregroundColor: scheme.onSurface,
+        iconTheme: IconThemeData(color: scheme.onSurface.withAlpha(217)),
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
@@ -161,10 +166,14 @@ sealed class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: isDark ? const Color(0xFF111218) : _grey50,
+        iconColor: scheme.onSurface.withAlpha(isDark ? 204 : 191),
+        prefixIconColor: scheme.onSurface.withAlpha(isDark ? 204 : 191),
+        suffixIconColor: scheme.onSurface.withAlpha(isDark ? 204 : 191),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 14,
         ),
+
         hintStyle: textTheme.bodyMedium?.copyWith(
           color: scheme.onSurface.withAlpha(140),
           fontWeight: FontWeight.w500,
