@@ -416,7 +416,6 @@ class _SignupSlide extends StatelessWidget {
               surfaceTintColor: Colors.transparent,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
-                
               ),
               child: Padding(
                 padding: const EdgeInsets.all(4),
