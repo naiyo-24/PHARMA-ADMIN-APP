@@ -35,7 +35,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final auth = ref.watch(authNotifierProvider);
     final isLoading = auth.isLoading;
     final surface = theme.colorScheme.surface;
-    theme.colorScheme.outline.withAlpha(204);
+    final outline = theme.colorScheme.outline.withAlpha(204);
+    final green = theme.colorScheme.primary;
     final iconColor = theme.colorScheme.onSurface.withAlpha(204);
 
     ref.listen(authNotifierProvider, (prev, next) {
@@ -98,7 +99,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     surfaceTintColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
-                      
+                      side: BorderSide(color: outline),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(8),
@@ -116,7 +117,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 prefixIcon: Icon(
                                   Iconsax.sms,
                                   size: 20,
-                                  color: iconColor,
+                                  color: green,
                                 ),
                               ),
                               validator: (v) {
@@ -140,7 +141,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 prefixIcon: Icon(
                                   Iconsax.lock,
                                   size: 20,
-                                  color: iconColor,
+                                  color: green,
                                 ),
                                 suffixIcon: IconButton(
                                   onPressed: () =>
@@ -230,7 +231,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Divider(color: theme.dividerColor, thickness: 2,),
+                  Divider(color: theme.dividerColor, thickness: 2),
                   const SizedBox(height: 4),
                   Center(
                     child: Text.rich(

@@ -46,6 +46,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     final auth = ref.watch(authNotifierProvider);
     final isLoading = auth.isLoading;
     final iconColor = theme.colorScheme.onSurface.withAlpha(204);
+    final green = theme.colorScheme.primary;
 
     ref.listen(authNotifierProvider, (prev, next) {
       if (!mounted) return;
@@ -100,6 +101,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             ),
                           ],
                           footer: _alreadyHaveAccount(theme),
+                          actions: _slideActions(isLoading: isLoading),
                         ),
                         _SignupSlide(
                           title: 'Contact & identity',
@@ -110,9 +112,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
                               textInputAction: TextInputAction.next,
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 labelText: 'Email ID',
-                                prefixIcon: Icon(Iconsax.sms, size: 20),
+                                prefixIcon: Icon(
+                                  Iconsax.sms,
+                                  size: 20,
+                                  color: green,
+                                ),
                               ),
                             ),
                             const SizedBox(height: 14),
@@ -126,6 +132,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             ),
                           ],
                           footer: _alreadyHaveAccount(theme),
+                          actions: _slideActions(isLoading: isLoading),
                         ),
                         _SignupSlide(
                           title: 'Security',
@@ -153,7 +160,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                                 prefixIcon: Icon(
                                   Iconsax.lock,
                                   size: 20,
-                                  color: iconColor,
+                                  color: green,
                                 ),
                                 suffixIcon: IconButton(
                                   onPressed: () =>
@@ -168,44 +175,46 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             ),
                           ],
                           footer: _alreadyHaveAccount(theme),
+                          actions: _slideActions(isLoading: isLoading),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      if (_pageIndex > 0)
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: isLoading
-                                ? null
-                                : () => _goToPage(_pageIndex - 1),
-                            child: const Text('Back'),
-                          ),
-                        ),
-                      if (_pageIndex > 0) const SizedBox(width: 12),
-                      Expanded(
-                        child: FilledButton(
-                          onPressed: isLoading ? null : _onPrimary,
-                          child: isLoading
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Text(_pageIndex < 2 ? 'Next' : 'Sign up'),
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _slideActions({required bool isLoading}) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Row(
+        children: [
+          if (_pageIndex > 0)
+            Expanded(
+              child: OutlinedButton(
+                onPressed: isLoading ? null : () => _goToPage(_pageIndex - 1),
+                child: const Text('Back'),
+              ),
+            ),
+          if (_pageIndex > 0) const SizedBox(width: 12),
+          Expanded(
+            child: FilledButton(
+              onPressed: isLoading ? null : _onPrimary,
+              child: isLoading
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(_pageIndex < 2 ? 'Next' : 'Sign up'),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -360,12 +369,14 @@ class _SignupSlide extends StatelessWidget {
     required this.caption,
     required this.fields,
     required this.footer,
+    required this.actions,
   });
 
   final String title;
   final String caption;
   final List<Widget> fields;
   final Widget footer;
+  final Widget actions;
 
   @override
   Widget build(BuildContext context) {
@@ -405,7 +416,7 @@ class _SignupSlide extends StatelessWidget {
               surfaceTintColor: Colors.transparent,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24),
-               
+                
               ),
               child: Padding(
                 padding: const EdgeInsets.all(4),
@@ -420,6 +431,7 @@ class _SignupSlide extends StatelessWidget {
                       ),
                     ),
                     footer,
+                    actions,
                   ],
                 ),
               ),
