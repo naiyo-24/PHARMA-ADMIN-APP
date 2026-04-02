@@ -12,6 +12,7 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onMenuPressed,
     this.actions,
     this.bottom,
+    this.height = 72,
   });
 
   final String? title;
@@ -26,17 +27,19 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   final List<Widget>? actions;
   final PreferredSizeWidget? bottom;
+  final double height;
 
   @override
   Size get preferredSize {
     final bottomHeight = bottom?.preferredSize.height ?? 0;
-    return Size.fromHeight(72 + bottomHeight);
+    return Size.fromHeight(height + bottomHeight);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final canPop = Navigator.of(context).canPop();
+    final outline = theme.colorScheme.outline.withAlpha(102);
 
     final resolvedTitle = (title == null || title!.trim().isEmpty)
         ? 'Naiyo24'
@@ -46,12 +49,19 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
         : subtitle!.trim();
 
     return AppBar(
+      toolbarHeight: height,
       backgroundColor: theme.colorScheme.surface,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
+      scrolledUnderElevation: 0,
+      shadowColor: Colors.transparent,
       centerTitle: false,
       titleSpacing: 8,
       leadingWidth: 64,
+      actionsIconTheme: IconThemeData(
+        color: theme.colorScheme.onSurface.withAlpha(230),
+        size: 22,
+      ),
       leading: _Leading(
         showLogo: showLogo,
         logoAssetPath: logoAssetPath,
@@ -59,6 +69,7 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
         canPop: canPop,
         showMenuIfNoBack: showMenuIfNoBack,
         onMenuPressed: onMenuPressed,
+        outline: outline,
       ),
       title: _Title(title: resolvedTitle, subtitle: resolvedSubtitle),
       actions: actions,
@@ -75,6 +86,7 @@ class _Leading extends StatelessWidget {
     required this.canPop,
     required this.showMenuIfNoBack,
     required this.onMenuPressed,
+    required this.outline,
   });
 
   final bool showLogo;
@@ -83,14 +95,15 @@ class _Leading extends StatelessWidget {
   final bool canPop;
   final bool showMenuIfNoBack;
   final VoidCallback? onMenuPressed;
+  final Color outline;
 
   @override
   Widget build(BuildContext context) {
     if (showLogo && logoAssetPath != null && logoAssetPath!.trim().isNotEmpty) {
       return Padding(
         padding: const EdgeInsets.only(left: 12),
-        child: Align(
-          alignment: Alignment.centerLeft,
+        child: _LeadingContainer(
+          outline: outline,
           child: Image.asset(
             logoAssetPath!,
             width: 34,
@@ -109,22 +122,42 @@ class _Leading extends StatelessWidget {
 
   Widget _fallbackLeading(BuildContext context) {
     if (showBackIfPossible && canPop) {
-      return IconButton(
-        tooltip: 'Back',
-        onPressed: () => Navigator.of(context).maybePop(),
-        icon: const Icon(Icons.arrow_back_rounded),
+      return Padding(
+        padding: const EdgeInsets.only(left: 12),
+        child: _LeadingContainer(
+          outline: outline,
+          child: IconButton(
+            tooltip: 'Back',
+            constraints: const BoxConstraints.tightFor(width: 44, height: 44),
+            padding: EdgeInsets.zero,
+            onPressed: () => Navigator.of(context).maybePop(),
+            icon: const Icon(Icons.arrow_back_rounded),
+          ),
+        ),
       );
     }
 
     if (showMenuIfNoBack) {
-      return Builder(
-        builder: (innerContext) {
-          return IconButton(
-            tooltip: 'Menu',
-            onPressed: onMenuPressed ?? () => _openDrawerIfAny(innerContext),
-            icon: const Icon(Icons.menu_rounded),
-          );
-        },
+      return Padding(
+        padding: const EdgeInsets.only(left: 12),
+        child: _LeadingContainer(
+          outline: outline,
+          child: Builder(
+            builder: (innerContext) {
+              return IconButton(
+                tooltip: 'Menu',
+                constraints: const BoxConstraints.tightFor(
+                  width: 44,
+                  height: 44,
+                ),
+                padding: EdgeInsets.zero,
+                onPressed:
+                    onMenuPressed ?? () => _openDrawerIfAny(innerContext),
+                icon: const Icon(Icons.menu_rounded),
+              );
+            },
+          ),
+        ),
       );
     }
 
@@ -140,6 +173,32 @@ class _Leading extends StatelessWidget {
   }
 }
 
+class _LeadingContainer extends StatelessWidget {
+  const _LeadingContainer({required this.child, required this.outline});
+
+  final Widget child;
+  final Color outline;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: outline),
+        ),
+        child: Center(child: child),
+      ),
+    );
+  }
+}
+
 class _Title extends StatelessWidget {
   const _Title({required this.title, required this.subtitle});
 
@@ -149,6 +208,16 @@ class _Title extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    final titleStyle = theme.textTheme.titleLarge?.copyWith(
+      fontWeight: FontWeight.w900,
+      letterSpacing: -0.2,
+    );
+    final subtitleStyle = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurface.withAlpha(166),
+      fontWeight: FontWeight.w800,
+      letterSpacing: 0.15,
+    );
 
     return Padding(
       padding: const EdgeInsets.only(right: 6),
@@ -160,19 +229,14 @@ class _Title extends StatelessWidget {
             title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
+            style: titleStyle,
           ),
           const SizedBox(height: 2),
           Text(
             subtitle,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withAlpha(166),
-              fontWeight: FontWeight.w700,
-            ),
+            style: subtitleStyle,
           ),
         ],
       ),

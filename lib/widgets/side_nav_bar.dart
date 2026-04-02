@@ -17,6 +17,7 @@ enum SideNavDestination {
   profile,
   aboutUs,
   helpCenter,
+  termsconditions,
 }
 
 extension SideNavDestinationX on SideNavDestination {
@@ -54,6 +55,8 @@ extension SideNavDestinationX on SideNavDestination {
         return 'About Us';
       case SideNavDestination.helpCenter:
         return 'Help Center';
+      case SideNavDestination.termsconditions:
+        return 'Terms & Conditions';
     }
   }
 
@@ -91,6 +94,8 @@ extension SideNavDestinationX on SideNavDestination {
         return Icons.info_rounded;
       case SideNavDestination.helpCenter:
         return Icons.support_agent_rounded;
+      case SideNavDestination.termsconditions:
+        return Icons.article_rounded;
     }
   }
 }
@@ -132,6 +137,7 @@ class SideNavBarDrawer extends StatelessWidget {
     SideNavDestination.profile,
     SideNavDestination.aboutUs,
     SideNavDestination.helpCenter,
+    SideNavDestination.termsconditions,
   ];
 
   @override
