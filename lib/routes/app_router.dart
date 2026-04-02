@@ -60,14 +60,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const MrManagementScreen(),
         routes: [
           GoRoute(
-            path: AppRoutes.mrDetailsPath,
-            name: AppRoutes.mrDetails,
-            builder: (context, state) {
-              final mrId = state.pathParameters['mrId'] ?? '';
-              return MrDetailsScreen(mrId: mrId);
-            },
-          ),
-          GoRoute(
             path: AppRoutes.onboardMrPath,
             name: AppRoutes.onboardMr,
             builder: (context, state) => const OnboardEditMrScreen(),
@@ -78,6 +70,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) {
               final mrId = state.pathParameters['mrId'] ?? '';
               return OnboardEditMrScreen(mrId: mrId);
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.mrDetailsPath,
+            name: AppRoutes.mrDetails,
+            builder: (context, state) {
+              final mrId = state.pathParameters['mrId'] ?? '';
+              return MrDetailsScreen(mrId: mrId);
             },
           ),
         ],
