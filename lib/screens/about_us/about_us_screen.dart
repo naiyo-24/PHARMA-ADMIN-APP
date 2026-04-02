@@ -2,37 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../cards/dashboard/count_card.dart';
-import '../../cards/dashboard/footer_card.dart';
-import '../../cards/dashboard/welcome_card.dart';
-import '../../notifiers/dashboard_notifier.dart';
+import '../../cards/about_us/about_us_contact_card.dart';
+import '../../cards/about_us/about_us_description_card.dart';
+import '../../cards/about_us/about_us_director_card.dart';
+import '../../cards/about_us/about_us_header_card.dart';
+import '../../notifiers/about_us_notifier.dart';
 import '../../routes/app_router.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/side_nav_bar.dart';
 
-class DashboardScreen extends ConsumerWidget {
-  const DashboardScreen({super.key});
+class AboutUsScreen extends ConsumerWidget {
+  const AboutUsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final padding = AppLayout.pagePadding(context);
-    final metricsAsync = ref.watch(dashboardNotifierProvider);
+    final aboutAsync = ref.watch(aboutUsNotifierProvider);
 
     return Scaffold(
       appBar: const AppAppBar(
         showLogo: false,
         showBackIfPossible: false,
-        title: 'Dashboard',
-        subtitle: 'Admin overview',
-        showMenuIfNoBack: true,
+        title: 'About Us',
+        subtitle: 'Company & software',
       ),
       drawer: SideNavBarDrawer(
         companyName: 'Naiyo24',
         tagline: 'Admin console',
         selectedIndex: SideNavBarDrawer.destinations.indexOf(
-          SideNavDestination.dashboard,
+          SideNavDestination.aboutUs,
         ),
         onSelectedIndex: (index) {
           final dashboardIndex = SideNavBarDrawer.destinations.indexOf(
@@ -57,22 +57,41 @@ class DashboardScreen extends ConsumerWidget {
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1120),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const WelcomeCard(adminName: 'Admin'),
-                  const SizedBox(height: 14),
-                  metricsAsync.when(
-                    data: (metrics) => CountCard(metrics: metrics),
-                    loading: () => _LoadingCard(theme: theme),
-                    error: (e, _) =>
-                        _ErrorCard(message: 'Failed to load counts.'),
-                  ),
-                  const SizedBox(height: 14),
-                  const FooterCard(
-                    logoAssetPath: 'assets/logo/naiyo24_logo.png',
-                  ),
-                ],
+              child: aboutAsync.when(
+                data: (about) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AboutUsHeaderCard(
+                        logoAssetPath: about.logoAssetPath,
+                        companyName: about.companyName,
+                        tagline: about.tagline,
+                      ),
+                      const SizedBox(height: 14),
+                      AboutUsDescriptionCard(
+                        briefDescription: about.briefDescription,
+                        detailedDescription: about.detailedDescription,
+                      ),
+                      const SizedBox(height: 14),
+                      AboutUsDirectorCard(
+                        directorImageAssetPath: about.directorImageAssetPath,
+                        directorName: about.directorName,
+                        directorMessage: about.directorMessage,
+                      ),
+                      const SizedBox(height: 14),
+                      AboutUsContactCard(
+                        address: about.address,
+                        phoneNumber: about.phoneNumber,
+                        email: about.email,
+                        website: about.website,
+                      ),
+                    ],
+                  );
+                },
+                loading: () => _LoadingCard(theme: theme),
+                error: (e, _) => const _ErrorCard(
+                  message: 'Failed to load About Us details.',
+                ),
               ),
             ),
           ),
@@ -109,7 +128,7 @@ class _LoadingCard extends StatelessWidget {
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
             SizedBox(width: 12),
-            Text('Loading counts...'),
+            Text('Loading About Us...'),
           ],
         ),
       ),

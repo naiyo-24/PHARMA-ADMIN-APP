@@ -108,6 +108,8 @@ class SideNavBarDrawer extends StatelessWidget {
     this.logoAssetPath = 'assets/logo/naiyo24_logo.png',
     this.selected,
     this.onSelected,
+    this.selectedIndex,
+    this.onSelectedIndex,
     this.width,
   });
 
@@ -117,6 +119,9 @@ class SideNavBarDrawer extends StatelessWidget {
 
   final SideNavDestination? selected;
   final ValueChanged<SideNavDestination>? onSelected;
+
+  final int? selectedIndex;
+  final ValueChanged<int>? onSelectedIndex;
 
   final double? width;
 
@@ -143,12 +148,12 @@ class SideNavBarDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final selectedIndex = selected == null
+    final computedIndex = selected == null
         ? null
         : destinations.indexWhere((d) => d == selected);
-    final resolvedSelectedIndex = (selectedIndex == null || selectedIndex < 0)
-        ? null
-        : selectedIndex;
+    final resolvedSelectedIndex = (selectedIndex != null)
+        ? selectedIndex
+        : ((computedIndex == null || computedIndex < 0) ? null : computedIndex);
 
     final isDark = theme.brightness == Brightness.dark;
     final selectedTextColor = isDark
@@ -196,6 +201,7 @@ class SideNavBarDrawer extends StatelessWidget {
             onDestinationSelected: (index) {
               final destination = destinations[index];
               Navigator.of(context).maybePop();
+              onSelectedIndex?.call(index);
               onSelected?.call(destination);
             },
             children: [

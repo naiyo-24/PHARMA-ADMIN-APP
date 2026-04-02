@@ -29,14 +29,23 @@ class TermsConditionsScreen extends ConsumerWidget {
       drawer: SideNavBarDrawer(
         companyName: 'Naiyo24',
         tagline: 'Admin console',
-        selected: SideNavDestination.termsconditions,
-        onSelected: (d) {
-          if (d == SideNavDestination.dashboard) {
-            context.goNamed(AppRoutes.dashboard);
-          }
-          if (d == SideNavDestination.termsconditions) {
-            context.goNamed(AppRoutes.termsConditions);
-          }
+        selectedIndex: SideNavBarDrawer.destinations.indexOf(
+          SideNavDestination.termsconditions,
+        ),
+        onSelectedIndex: (index) {
+          final dashboardIndex = SideNavBarDrawer.destinations.indexOf(
+            SideNavDestination.dashboard,
+          );
+          final aboutIndex = SideNavBarDrawer.destinations.indexOf(
+            SideNavDestination.aboutUs,
+          );
+          final termsIndex = SideNavBarDrawer.destinations.indexOf(
+            SideNavDestination.termsconditions,
+          );
+
+          if (index == dashboardIndex) context.goNamed(AppRoutes.dashboard);
+          if (index == aboutIndex) context.goNamed(AppRoutes.aboutUs);
+          if (index == termsIndex) context.goNamed(AppRoutes.termsConditions);
         },
       ),
       body: SafeArea(
