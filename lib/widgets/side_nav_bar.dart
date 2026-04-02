@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../routes/app_router.dart';
 
 enum SideNavDestination {
   dashboard,
@@ -109,7 +112,9 @@ class SideNavBarDrawer extends StatelessWidget {
     this.selected,
     this.onSelected,
     this.selectedIndex,
+    this.currentIndex,
     this.onSelectedIndex,
+    this.enableInternalRouting = true,
     this.width,
   });
 
@@ -121,7 +126,10 @@ class SideNavBarDrawer extends StatelessWidget {
   final ValueChanged<SideNavDestination>? onSelected;
 
   final int? selectedIndex;
+  final int? currentIndex;
   final ValueChanged<int>? onSelectedIndex;
+
+  final bool enableInternalRouting;
 
   final double? width;
 
@@ -151,9 +159,7 @@ class SideNavBarDrawer extends StatelessWidget {
     final computedIndex = selected == null
         ? null
         : destinations.indexWhere((d) => d == selected);
-    final resolvedSelectedIndex = (selectedIndex != null)
-        ? selectedIndex
-        : ((computedIndex == null || computedIndex < 0) ? null : computedIndex);
+    final resolvedSelectedIndex = (selectedIndex ?? currentIndex) ?? ((computedIndex == null || computedIndex < 0) ? null : computedIndex);
 
     final isDark = theme.brightness == Brightness.dark;
     final selectedTextColor = isDark
@@ -200,9 +206,16 @@ class SideNavBarDrawer extends StatelessWidget {
             selectedIndex: resolvedSelectedIndex,
             onDestinationSelected: (index) {
               final destination = destinations[index];
+              final router = GoRouter.of(context);
               Navigator.of(context).maybePop();
               onSelectedIndex?.call(index);
               onSelected?.call(destination);
+              if (enableInternalRouting) {
+                final routeName = _routeNameForDestination(destination);
+                if (routeName != null) {
+                  router.goNamed(routeName);
+                }
+              }
             },
             children: [
               _SideNavHeader(
@@ -237,6 +250,36 @@ class SideNavBarDrawer extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String? _routeNameForDestination(SideNavDestination destination) {
+    switch (destination) {
+      case SideNavDestination.dashboard:
+        return AppRoutes.dashboard;
+      case SideNavDestination.mrManagement:
+        return AppRoutes.mrManagement;
+      case SideNavDestination.asmManagement:
+        return AppRoutes.asmManagement;
+      case SideNavDestination.visualAdsManagement:
+        return AppRoutes.visualAdsManagement;
+      case SideNavDestination.profile:
+        return AppRoutes.profile;
+      case SideNavDestination.aboutUs:
+        return AppRoutes.aboutUs;
+      case SideNavDestination.termsconditions:
+        return AppRoutes.termsConditions;
+      case SideNavDestination.teamManagement:
+      case SideNavDestination.attendanceRecords:
+      case SideNavDestination.dcr:
+      case SideNavDestination.tripPlanManagement:
+      case SideNavDestination.orderManagement:
+      case SideNavDestination.distributorManagement:
+      case SideNavDestination.chemistShopManagement:
+      case SideNavDestination.salarySlipManagement:
+      case SideNavDestination.announcements:
+      case SideNavDestination.helpCenter:
+        return null;
+    }
   }
 }
 

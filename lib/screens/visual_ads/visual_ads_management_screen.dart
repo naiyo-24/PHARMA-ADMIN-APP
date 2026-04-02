@@ -41,39 +41,7 @@ class _VisualAdsManagementScreenState
         selectedIndex: SideNavBarDrawer.destinations.indexOf(
           SideNavDestination.visualAdsManagement,
         ),
-        onSelectedIndex: (index) {
-          final dashboardIndex = SideNavBarDrawer.destinations.indexOf(
-            SideNavDestination.dashboard,
-          );
-          final mrIndex = SideNavBarDrawer.destinations.indexOf(
-            SideNavDestination.mrManagement,
-          );
-          final asmIndex = SideNavBarDrawer.destinations.indexOf(
-            SideNavDestination.asmManagement,
-          );
-          final visualAdsIndex = SideNavBarDrawer.destinations.indexOf(
-            SideNavDestination.visualAdsManagement,
-          );
-          final profileIndex = SideNavBarDrawer.destinations.indexOf(
-            SideNavDestination.profile,
-          );
-          final aboutIndex = SideNavBarDrawer.destinations.indexOf(
-            SideNavDestination.aboutUs,
-          );
-          final termsIndex = SideNavBarDrawer.destinations.indexOf(
-            SideNavDestination.termsconditions,
-          );
-
-          if (index == dashboardIndex) context.goNamed(AppRoutes.dashboard);
-          if (index == mrIndex) context.goNamed(AppRoutes.mrManagement);
-          if (index == asmIndex) context.goNamed(AppRoutes.asmManagement);
-          if (index == visualAdsIndex) {
-            context.goNamed(AppRoutes.visualAdsManagement);
-          }
-          if (index == profileIndex) context.goNamed(AppRoutes.profile);
-          if (index == aboutIndex) context.goNamed(AppRoutes.aboutUs);
-          if (index == termsIndex) context.goNamed(AppRoutes.termsConditions);
-        },
+        onSelectedIndex: (index) => context.goNamed(AppRoutes.visualAdsManagement),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.goNamed(AppRoutes.createVisualAd),

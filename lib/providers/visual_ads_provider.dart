@@ -11,7 +11,7 @@ abstract class VisualAdsRepository {
 class InMemoryVisualAdsRepository implements VisualAdsRepository {
   InMemoryVisualAdsRepository();
 
-  final List<VisualAd> _items = const [
+  final List<VisualAd> _items = <VisualAd>[
     VisualAd(id: 'va_1', name: 'Summer Campaign', imageBytes: null),
     VisualAd(id: 'va_2', name: 'New Launch Banner', imageBytes: null),
   ];
