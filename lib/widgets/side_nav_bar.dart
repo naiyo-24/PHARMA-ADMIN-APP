@@ -33,7 +33,7 @@ extension SideNavDestinationX on SideNavDestination {
       case SideNavDestination.visualAdsManagement:
         return 'Visual Ads Management';
       case SideNavDestination.attendanceRecords:
-        return 'Attendance Records (MR and ASM)';
+        return 'Attendance Records';
       case SideNavDestination.dcr:
         return 'DCR';
       case SideNavDestination.tripPlanManagement:
@@ -144,36 +144,70 @@ class SideNavBarDrawer extends StatelessWidget {
         ? null
         : selectedIndex;
 
+    final isDark = theme.brightness == Brightness.dark;
+    final selectedTextColor = isDark
+        ? theme.colorScheme.onSurface
+        : theme.colorScheme.surface;
+    final unselectedTextColor = theme.colorScheme.onSurface.withAlpha(191);
+    final unselectedIconColor = theme.colorScheme.onSurface.withAlpha(204);
+
+    final navTheme = NavigationDrawerThemeData(
+      backgroundColor: theme.colorScheme.surface,
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+      tileHeight: 52,
+      indicatorShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+      indicatorColor: isDark
+          ? theme.colorScheme.surfaceContainerHighest
+          : theme.colorScheme.onSurface,
+      iconTheme: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return IconThemeData(color: theme.colorScheme.primary, size: 22);
+        }
+        return IconThemeData(color: unselectedIconColor, size: 22);
+      }),
+      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+        final base = theme.textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.1,
+        );
+        if (states.contains(WidgetState.selected)) {
+          return base?.copyWith(color: selectedTextColor);
+        }
+        return base?.copyWith(color: unselectedTextColor);
+      }),
+    );
+
     return Drawer(
       width: width,
       child: SafeArea(
-        child: NavigationDrawer(
-          selectedIndex: resolvedSelectedIndex,
-          onDestinationSelected: (index) {
-            final destination = destinations[index];
-            Navigator.of(context).maybePop();
-            onSelected?.call(destination);
-          },
-          children: [
-            _SideNavHeader(
-              companyName: companyName,
-              tagline: tagline,
-              logoAssetPath: logoAssetPath,
-            ),
-            const SizedBox(height: 6),
-            for (final d in destinations)
-              NavigationDrawerDestination(
-                icon: Icon(d.icon),
-                selectedIcon: Icon(d.icon),
-                label: Text(
-                  d.label,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+        child: NavigationDrawerTheme(
+          data: navTheme,
+          child: NavigationDrawer(
+            selectedIndex: resolvedSelectedIndex,
+            onDestinationSelected: (index) {
+              final destination = destinations[index];
+              Navigator.of(context).maybePop();
+              onSelected?.call(destination);
+            },
+            children: [
+              _SideNavHeader(
+                companyName: companyName,
+                tagline: tagline,
+                logoAssetPath: logoAssetPath,
               ),
-            const SizedBox(height: 10),
-          ],
+              const SizedBox(height: 6),
+              for (final d in destinations)
+                NavigationDrawerDestination(
+                  icon: Icon(d.icon),
+                  selectedIcon: Icon(d.icon),
+                  label: Text(d.label),
+                ),
+              const SizedBox(height: 10),
+            ],
+          ),
         ),
       ),
     );
@@ -201,7 +235,7 @@ class _SideNavHeader extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
+          color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: outline),
         ),
