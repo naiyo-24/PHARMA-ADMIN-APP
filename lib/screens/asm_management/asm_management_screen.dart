@@ -11,199 +11,203 @@ import '../../widgets/app_bar.dart';
 import '../../widgets/side_nav_bar.dart';
 
 class AsmManagementScreen extends ConsumerStatefulWidget {
-	const AsmManagementScreen({super.key});
+  const AsmManagementScreen({super.key});
 
-	@override
-	ConsumerState<AsmManagementScreen> createState() => _AsmManagementScreenState();
+  @override
+  ConsumerState<AsmManagementScreen> createState() =>
+      _AsmManagementScreenState();
 }
 
 class _AsmManagementScreenState extends ConsumerState<AsmManagementScreen> {
-	String _query = '';
+  String _query = '';
 
-	@override
-	Widget build(BuildContext context) {
-		final theme = Theme.of(context);
-		final padding = AppLayout.pagePadding(context);
-		final listAsync = ref.watch(asmManagementNotifierProvider);
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final padding = AppLayout.pagePadding(context);
+    final listAsync = ref.watch(asmManagementNotifierProvider);
 
-		return Scaffold(
-			appBar: const AppAppBar(
-				showLogo: false,
-				showBackIfPossible: false,
-				title: 'ASM Management',
-				subtitle: 'Onboard, edit, and manage ASMs',
-			),
-			drawer: SideNavBarDrawer(
-				companyName: 'Naiyo24',
-				tagline: 'Admin console',
-				selectedIndex: SideNavBarDrawer.destinations.indexOf(
-					SideNavDestination.asmManagement,
-				),
-				onSelectedIndex: (index) {
-					final dashboardIndex = SideNavBarDrawer.destinations.indexOf(
-						SideNavDestination.dashboard,
-					);
-					final mrIndex = SideNavBarDrawer.destinations.indexOf(
-						SideNavDestination.mrManagement,
-					);
-					final asmIndex = SideNavBarDrawer.destinations.indexOf(
-						SideNavDestination.asmManagement,
-					);
-					final profileIndex = SideNavBarDrawer.destinations.indexOf(
-						SideNavDestination.profile,
-					);
-					final aboutIndex = SideNavBarDrawer.destinations.indexOf(
-						SideNavDestination.aboutUs,
-					);
-					final termsIndex = SideNavBarDrawer.destinations.indexOf(
-						SideNavDestination.termsconditions,
-					);
+    return Scaffold(
+      appBar: const AppAppBar(
+        showLogo: false,
+        showBackIfPossible: false,
+        title: 'ASM Management',
+        subtitle: 'Onboard, edit, and manage ASMs',
+      ),
+      drawer: SideNavBarDrawer(
+        companyName: 'Naiyo24',
+        tagline: 'Admin console',
+        selectedIndex: SideNavBarDrawer.destinations.indexOf(
+          SideNavDestination.asmManagement,
+        ),
+        onSelectedIndex: (index) {
+          final dashboardIndex = SideNavBarDrawer.destinations.indexOf(
+            SideNavDestination.dashboard,
+          );
+          final mrIndex = SideNavBarDrawer.destinations.indexOf(
+            SideNavDestination.mrManagement,
+          );
+          final asmIndex = SideNavBarDrawer.destinations.indexOf(
+            SideNavDestination.asmManagement,
+          );
+          final visualAdsIndex = SideNavBarDrawer.destinations.indexOf(
+            SideNavDestination.visualAdsManagement,
+          );
+          final profileIndex = SideNavBarDrawer.destinations.indexOf(
+            SideNavDestination.profile,
+          );
+          final aboutIndex = SideNavBarDrawer.destinations.indexOf(
+            SideNavDestination.aboutUs,
+          );
+          final termsIndex = SideNavBarDrawer.destinations.indexOf(
+            SideNavDestination.termsconditions,
+          );
 
-					if (index == dashboardIndex) context.goNamed(AppRoutes.dashboard);
-					if (index == mrIndex) context.goNamed(AppRoutes.mrManagement);
-					if (index == asmIndex) context.goNamed(AppRoutes.asmManagement);
-					if (index == profileIndex) context.goNamed(AppRoutes.profile);
-					if (index == aboutIndex) context.goNamed(AppRoutes.aboutUs);
-					if (index == termsIndex) context.goNamed(AppRoutes.termsConditions);
-				},
-			),
-			floatingActionButton: FloatingActionButton.extended(
-				onPressed: () => context.goNamed(AppRoutes.onboardAsm),
-				icon: const Icon(Icons.person_add_alt_1_rounded),
-				label: const Text('Onboard ASM'),
-			),
-			body: SafeArea(
-				child: SingleChildScrollView(
-					padding: padding,
-					child: Align(
-						alignment: Alignment.topCenter,
-						child: ConstrainedBox(
-							constraints: const BoxConstraints(maxWidth: 1120),
-							child: Column(
-								crossAxisAlignment: CrossAxisAlignment.stretch,
-								children: [
-									AsmSearchBar(
-										hintText:
-											'Search ASM by name, phone, or headquarter',
-										onChanged: (v) => setState(() => _query = v),
-									),
-									const SizedBox(height: 14),
-									listAsync.when(
-										data: (items) {
-											final q = _query.trim().toLowerCase();
-											final filtered = (q.isEmpty)
-													? items
-													: items.where((m) {
-															return m.name.toLowerCase().contains(q) ||
-																m.phoneNumber.toLowerCase().contains(q) ||
-																m.headquarter.toLowerCase().contains(q);
-														}).toList();
+          if (index == dashboardIndex) context.goNamed(AppRoutes.dashboard);
+          if (index == mrIndex) context.goNamed(AppRoutes.mrManagement);
+          if (index == asmIndex) context.goNamed(AppRoutes.asmManagement);
+          if (index == visualAdsIndex) {
+            context.goNamed(AppRoutes.visualAdsManagement);
+          }
+          if (index == profileIndex) context.goNamed(AppRoutes.profile);
+          if (index == aboutIndex) context.goNamed(AppRoutes.aboutUs);
+          if (index == termsIndex) context.goNamed(AppRoutes.termsConditions);
+        },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.goNamed(AppRoutes.onboardAsm),
+        icon: const Icon(Icons.person_add_alt_1_rounded),
+        label: const Text('Onboard ASM'),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: padding,
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1120),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  AsmSearchBar(
+                    hintText: 'Search ASM by name, phone, or headquarter',
+                    onChanged: (v) => setState(() => _query = v),
+                  ),
+                  const SizedBox(height: 14),
+                  listAsync.when(
+                    data: (items) {
+                      final q = _query.trim().toLowerCase();
+                      final filtered = (q.isEmpty)
+                          ? items
+                          : items.where((m) {
+                              return m.name.toLowerCase().contains(q) ||
+                                  m.phoneNumber.toLowerCase().contains(q) ||
+                                  m.headquarter.toLowerCase().contains(q);
+                            }).toList();
 
-											return Column(
-												crossAxisAlignment: CrossAxisAlignment.stretch,
-												children: [
-													for (final asm in filtered) ...[
-														AsmCard(
-															photoBytes: asm.photoBytes,
-															name: asm.name,
-															phoneNumber: asm.phoneNumber,
-															headquarter: asm.headquarter,
-															onTap: () => context.goNamed(
-																AppRoutes.asmDetails,
-																pathParameters: {'asmId': asm.id},
-															),
-															onEdit: () => context.goNamed(
-																AppRoutes.editAsm,
-																pathParameters: {'asmId': asm.id},
-															),
-															onDelete: () => ref
-																.read(asmManagementNotifierProvider.notifier)
-																.delete(asm.id),
-														),
-														const SizedBox(height: 12),
-													],
-												],
-											);
-										},
-										loading: () => _LoadingCard(theme: theme),
-										error: (e, _) => const _ErrorCard(
-											message: 'Failed to load ASM list.',
-										),
-									),
-								],
-							),
-						),
-					),
-				),
-			),
-		);
-	}
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          for (final asm in filtered) ...[
+                            AsmCard(
+                              photoBytes: asm.photoBytes,
+                              name: asm.name,
+                              phoneNumber: asm.phoneNumber,
+                              headquarter: asm.headquarter,
+                              onTap: () => context.goNamed(
+                                AppRoutes.asmDetails,
+                                pathParameters: {'asmId': asm.id},
+                              ),
+                              onEdit: () => context.goNamed(
+                                AppRoutes.editAsm,
+                                pathParameters: {'asmId': asm.id},
+                              ),
+                              onDelete: () => ref
+                                  .read(asmManagementNotifierProvider.notifier)
+                                  .delete(asm.id),
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                        ],
+                      );
+                    },
+                    loading: () => _LoadingCard(theme: theme),
+                    error: (e, _) =>
+                        const _ErrorCard(message: 'Failed to load ASM list.'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _LoadingCard extends StatelessWidget {
-	const _LoadingCard({required this.theme});
+  const _LoadingCard({required this.theme});
 
-	final ThemeData theme;
+  final ThemeData theme;
 
-	@override
-	Widget build(BuildContext context) {
-		final outline = theme.colorScheme.outline.withAlpha(204);
+  @override
+  Widget build(BuildContext context) {
+    final outline = theme.colorScheme.outline.withAlpha(204);
 
-		return Card(
-			elevation: 0,
-			surfaceTintColor: Colors.transparent,
-			color: theme.colorScheme.surface,
-			shape: RoundedRectangleBorder(
-				borderRadius: BorderRadius.circular(24),
-				side: BorderSide(color: outline),
-			),
-			child: const Padding(
-				padding: EdgeInsets.all(18),
-				child: Row(
-					children: [
-						SizedBox(
-							width: 18,
-							height: 18,
-							child: CircularProgressIndicator(strokeWidth: 2),
-						),
-						SizedBox(width: 12),
-						Text('Loading ASMs...'),
-					],
-				),
-			),
-		);
-	}
+    return Card(
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+      color: theme.colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+        side: BorderSide(color: outline),
+      ),
+      child: const Padding(
+        padding: EdgeInsets.all(18),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            SizedBox(width: 12),
+            Text('Loading ASMs...'),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _ErrorCard extends StatelessWidget {
-	const _ErrorCard({required this.message});
+  const _ErrorCard({required this.message});
 
-	final String message;
+  final String message;
 
-	@override
-	Widget build(BuildContext context) {
-		final theme = Theme.of(context);
-		final outline = theme.colorScheme.outline.withAlpha(204);
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final outline = theme.colorScheme.outline.withAlpha(204);
 
-		return Card(
-			elevation: 0,
-			surfaceTintColor: Colors.transparent,
-			color: theme.colorScheme.surface,
-			shape: RoundedRectangleBorder(
-				borderRadius: BorderRadius.circular(24),
-				side: BorderSide(color: outline),
-			),
-			child: Padding(
-				padding: const EdgeInsets.all(18),
-				child: Text(
-					message,
-					style: theme.textTheme.bodyMedium?.copyWith(
-						color: theme.colorScheme.error,
-						fontWeight: FontWeight.w700,
-					),
-				),
-			),
-		);
-	}
+    return Card(
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+      color: theme.colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+        side: BorderSide(color: outline),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Text(
+          message,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.error,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
 }
-

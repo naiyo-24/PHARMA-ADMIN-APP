@@ -15,6 +15,9 @@ import '../screens/mr_management/mr_management_screen.dart';
 import '../screens/mr_management/onboard_edit_mr_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/terms_conditions/terms_conditions_screen.dart';
+import '../screens/visual_ads/create_edit_visual_ads_screen.dart';
+import '../screens/visual_ads/visual_ad_preview_screen.dart';
+import '../screens/visual_ads/visual_ads_management_screen.dart';
 
 sealed class AppRoutes {
   static const splash = 'splash';
@@ -34,6 +37,11 @@ sealed class AppRoutes {
   static const onboardAsm = 'onboardAsm';
   static const editAsm = 'editAsm';
 
+  static const visualAdsManagement = 'visualAdsManagement';
+  static const createVisualAd = 'createVisualAd';
+  static const editVisualAd = 'editVisualAd';
+  static const visualAdPreview = 'visualAdPreview';
+
   static const splashPath = '/';
   static const loginPath = '/login';
   static const signupPath = '/signup';
@@ -50,6 +58,11 @@ sealed class AppRoutes {
   static const asmDetailsPath = ':asmId';
   static const onboardAsmPath = 'onboard';
   static const editAsmPath = ':asmId/edit';
+
+  static const visualAdsManagementPath = '/visual-ads';
+  static const createVisualAdPath = 'create';
+  static const editVisualAdPath = ':adId/edit';
+  static const visualAdPreviewPath = ':adId/preview';
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -119,6 +132,34 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) {
               final mrId = state.pathParameters['mrId'] ?? '';
               return MrDetailsScreen(mrId: mrId);
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        path: AppRoutes.visualAdsManagementPath,
+        name: AppRoutes.visualAdsManagement,
+        builder: (context, state) => const VisualAdsManagementScreen(),
+        routes: [
+          GoRoute(
+            path: AppRoutes.createVisualAdPath,
+            name: AppRoutes.createVisualAd,
+            builder: (context, state) => const CreateEditVisualAdsScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.editVisualAdPath,
+            name: AppRoutes.editVisualAd,
+            builder: (context, state) {
+              final adId = state.pathParameters['adId'] ?? '';
+              return CreateEditVisualAdsScreen(adId: adId);
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.visualAdPreviewPath,
+            name: AppRoutes.visualAdPreview,
+            builder: (context, state) {
+              final adId = state.pathParameters['adId'] ?? '';
+              return VisualAdPreviewScreen(adId: adId);
             },
           ),
         ],

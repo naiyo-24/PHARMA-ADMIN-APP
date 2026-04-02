@@ -44,6 +44,9 @@ class DashboardScreen extends ConsumerWidget {
           final asmIndex = SideNavBarDrawer.destinations.indexOf(
             SideNavDestination.asmManagement,
           );
+          final visualAdsIndex = SideNavBarDrawer.destinations.indexOf(
+            SideNavDestination.visualAdsManagement,
+          );
           final profileIndex = SideNavBarDrawer.destinations.indexOf(
             SideNavDestination.profile,
           );
@@ -57,6 +60,9 @@ class DashboardScreen extends ConsumerWidget {
           if (index == dashboardIndex) context.goNamed(AppRoutes.dashboard);
           if (index == mrIndex) context.goNamed(AppRoutes.mrManagement);
           if (index == asmIndex) context.goNamed(AppRoutes.asmManagement);
+          if (index == visualAdsIndex) {
+            context.goNamed(AppRoutes.visualAdsManagement);
+          }
           if (index == profileIndex) context.goNamed(AppRoutes.profile);
           if (index == aboutIndex) context.goNamed(AppRoutes.aboutUs);
           if (index == termsIndex) context.goNamed(AppRoutes.termsConditions);
