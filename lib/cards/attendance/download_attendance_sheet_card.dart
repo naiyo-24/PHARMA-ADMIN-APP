@@ -33,7 +33,18 @@ class _DownloadAttendanceSheetCardState extends State<DownloadAttendanceSheetCar
 	@override
 	void initState() {
 		super.initState();
-		_selected = widget.initialSelection ?? (widget.options.isEmpty ? null : widget.options.first);
+		final initial = widget.initialSelection;
+		if (initial == null) {
+			_selected = widget.options.isEmpty ? null : widget.options.first;
+		} else {
+			_selected = widget.options.isEmpty
+					? null
+					: widget.options.firstWhere(
+							(o) => o == initial,
+							orElse: () => widget.options.first,
+						);
+			_selected ??= widget.options.isEmpty ? null : widget.options.first;
+		}
 		final now = DateTime.now();
 		_month = now.month;
 		_year = now.year;

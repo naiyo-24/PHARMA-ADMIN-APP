@@ -39,12 +39,22 @@ class _AttendanceManagementScreenState
 
 		final mrs = mrsAsync.asData?.value ?? const [];
 		final asms = asmsAsync.asData?.value ?? const [];
-		final options = <AttendanceSubject>[
+		final optionMap = <String, AttendanceSubject>{
 			for (final m in mrs)
-				AttendanceSubject(id: m.id, name: m.name, type: AttendanceSubjectType.mr),
+				'${AttendanceSubjectType.mr.name}:${m.id}': AttendanceSubject(
+					id: m.id,
+					name: m.name,
+					type: AttendanceSubjectType.mr,
+				),
 			for (final a in asms)
-				AttendanceSubject(id: a.id, name: a.name, type: AttendanceSubjectType.asm),
-		];
+				'${AttendanceSubjectType.asm.name}:${a.id}': AttendanceSubject(
+					id: a.id,
+					name: a.name,
+					type: AttendanceSubjectType.asm,
+				),
+		};
+		final options = optionMap.values.toList()
+			..sort((l, r) => l.name.toLowerCase().compareTo(r.name.toLowerCase()));
 
 		final records = attendanceAsync.asData?.value ?? const <AttendanceRecord>[];
 		final selected = _selectedSubject;

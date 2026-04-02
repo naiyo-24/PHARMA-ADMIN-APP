@@ -15,6 +15,15 @@ class AttendanceSubject {
 	final AttendanceSubjectType type;
 
 	String get label => type == AttendanceSubjectType.mr ? 'MR' : 'ASM';
+
+	@override
+	bool operator ==(Object other) {
+		return identical(this, other) ||
+				(other is AttendanceSubject && other.id == id && other.type == type);
+	}
+
+	@override
+	int get hashCode => Object.hash(id, type);
 }
 
 class AttendanceGeoPoint {
