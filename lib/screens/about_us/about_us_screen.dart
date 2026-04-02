@@ -38,6 +38,9 @@ class AboutUsScreen extends ConsumerWidget {
           final dashboardIndex = SideNavBarDrawer.destinations.indexOf(
             SideNavDestination.dashboard,
           );
+          final mrIndex = SideNavBarDrawer.destinations.indexOf(
+            SideNavDestination.mrManagement,
+          );
           final profileIndex = SideNavBarDrawer.destinations.indexOf(
             SideNavDestination.profile,
           );
@@ -49,6 +52,7 @@ class AboutUsScreen extends ConsumerWidget {
           );
 
           if (index == dashboardIndex) context.goNamed(AppRoutes.dashboard);
+          if (index == mrIndex) context.goNamed(AppRoutes.mrManagement);
           if (index == profileIndex) context.goNamed(AppRoutes.profile);
           if (index == aboutIndex) context.goNamed(AppRoutes.aboutUs);
           if (index == termsIndex) context.goNamed(AppRoutes.termsConditions);
