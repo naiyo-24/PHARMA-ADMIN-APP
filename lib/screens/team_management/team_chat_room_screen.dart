@@ -7,11 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:record/record.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../models/team_management.dart';
 import '../../notifiers/team_management_notifier.dart';
 import '../../routes/app_router.dart';
+import '../../utils/attachment_playback.dart';
+import '../../utils/video_controller_factory.dart';
 
 class TeamChatRoomScreen extends ConsumerStatefulWidget {
 	const TeamChatRoomScreen({super.key, required this.teamId});
@@ -126,7 +130,14 @@ class _TeamChatRoomScreenState extends ConsumerState<TeamChatRoomScreen> {
 											final isAdmin = m.senderType == TeamMessageSenderType.admin;
 											return Padding(
 												padding: const EdgeInsets.symmetric(vertical: 6),
-												child: _MessageBubble(message: m, isAdmin: isAdmin),
+												child: _MessageBubble(
+													message: m,
+													isAdmin: isAdmin,
+													onPlayAttachment: (attachment) => _playAttachment(
+														messageId: m.id,
+														attachment: attachment,
+													),
+												),
 											);
 										},
 									),
@@ -152,7 +163,8 @@ class _TeamChatRoomScreenState extends ConsumerState<TeamChatRoomScreen> {
 	}
 
 	Future<void> _sendText() async {
-		final text = _messageCtrl.text;
+		final text = _messageCtrl.text.trim();
+		if (text.isEmpty) return;
 		_messageCtrl.clear();
 		await ref
 				.read(teamManagementNotifierProvider.notifier)
@@ -308,7 +320,7 @@ class _TeamChatRoomScreenState extends ConsumerState<TeamChatRoomScreen> {
 		await _recordSub?.cancel();
 		await _recorder.stop();
 
-		final bytes = Uint8List.fromList(_recordedBytes);
+		final pcmBytes = Uint8List.fromList(_recordedBytes);
 		final durationMs = _recordDurationMs;
 
 		if (!mounted) return;
@@ -317,18 +329,121 @@ class _TeamChatRoomScreenState extends ConsumerState<TeamChatRoomScreen> {
 			_recordDurationMs = 0;
 		});
 
-		if (bytes.isEmpty) return;
+		if (pcmBytes.isEmpty) return;
+		final bytes = _encodeWavPcm16(
+			pcmBytes: pcmBytes,
+			sampleRate: 16000,
+			numChannels: 1,
+		);
 		final attachment = TeamMessageAttachment(
 			type: TeamMessageAttachmentType.voice,
 			bytes: bytes,
-			fileName: 'voice_${DateTime.now().millisecondsSinceEpoch}.pcm',
-			mimeType: 'audio/pcm',
+			fileName: 'voice_${DateTime.now().millisecondsSinceEpoch}.wav',
+			mimeType: 'audio/wav',
 			durationMs: durationMs,
 		);
 		await ref
 				.read(teamManagementNotifierProvider.notifier)
 				.sendAdminAttachmentMessage(teamId: widget.teamId, attachment: attachment);
 	}
+
+	Future<void> _playAttachment({
+		required String messageId,
+		required TeamMessageAttachment attachment,
+	}) async {
+		if (attachment.bytes.isEmpty) return;
+		if (attachment.type == TeamMessageAttachmentType.image) return;
+		if (attachment.type == TeamMessageAttachmentType.file) return;
+
+		final mimeType = switch (attachment.type) {
+			TeamMessageAttachmentType.video => attachment.mimeType ?? 'video/*',
+			TeamMessageAttachmentType.voice => attachment.mimeType ?? 'audio/*',
+			_ => attachment.mimeType,
+		};
+
+		final handle = await createAttachmentPlaybackHandle(
+			bytes: attachment.bytes,
+			fileName: '${messageId}_${attachment.fileName}',
+			mimeType: mimeType,
+		);
+		if (!mounted) {
+			await handle.dispose();
+			return;
+		}
+
+		try {
+			switch (attachment.type) {
+				case TeamMessageAttachmentType.video:
+					await showModalBottomSheet<void>(
+						context: context,
+						showDragHandle: true,
+						isScrollControlled: true,
+						builder: (context) => _VideoPlayerSheet(uri: handle.uri),
+					);
+					break;
+				case TeamMessageAttachmentType.voice:
+					await showModalBottomSheet<void>(
+						context: context,
+						showDragHandle: true,
+						builder: (context) => _AudioPlayerSheet(uri: handle.uri),
+					);
+					break;
+				case TeamMessageAttachmentType.image:
+				case TeamMessageAttachmentType.file:
+					break;
+			}
+		} finally {
+			await handle.dispose();
+		}
+	}
+}
+
+Uint8List _encodeWavPcm16({
+	required Uint8List pcmBytes,
+	required int sampleRate,
+	required int numChannels,
+}) {
+	const bitsPerSample = 16;
+	final byteRate = sampleRate * numChannels * (bitsPerSample ~/ 8);
+	final blockAlign = numChannels * (bitsPerSample ~/ 8);
+	final dataLength = pcmBytes.length;
+	final fileLength = 44 + dataLength;
+
+	final header = ByteData(44);
+	int o = 0;
+
+	void writeString(String s) {
+		for (final unit in s.codeUnits) {
+			header.setUint8(o++, unit);
+		}
+	}
+
+	writeString('RIFF');
+	header.setUint32(o, fileLength - 8, Endian.little);
+	o += 4;
+	writeString('WAVE');
+	writeString('fmt ');
+	header.setUint32(o, 16, Endian.little);
+	o += 4;
+	header.setUint16(o, 1, Endian.little);
+	o += 2;
+	header.setUint16(o, numChannels, Endian.little);
+	o += 2;
+	header.setUint32(o, sampleRate, Endian.little);
+	o += 4;
+	header.setUint32(o, byteRate, Endian.little);
+	o += 4;
+	header.setUint16(o, blockAlign, Endian.little);
+	o += 2;
+	header.setUint16(o, bitsPerSample, Endian.little);
+	o += 2;
+	writeString('data');
+	header.setUint32(o, dataLength, Endian.little);
+
+	final out = Uint8List(fileLength);
+	out.setRange(0, 44, header.buffer.asUint8List());
+	out.setRange(44, fileLength, pcmBytes);
+	return out;
 }
 
 class _ComposerBar extends StatelessWidget {
@@ -440,10 +555,15 @@ class _ComposerBar extends StatelessWidget {
 }
 
 class _MessageBubble extends StatelessWidget {
-	const _MessageBubble({required this.message, required this.isAdmin});
+	const _MessageBubble({
+		required this.message,
+		required this.isAdmin,
+		required this.onPlayAttachment,
+	});
 
 	final TeamChatMessage message;
 	final bool isAdmin;
+	final ValueChanged<TeamMessageAttachment> onPlayAttachment;
 
 	@override
 	Widget build(BuildContext context) {
@@ -493,7 +613,15 @@ class _MessageBubble extends StatelessWidget {
 								if (message.attachment != null) ...[
 									if (message.text != null && message.text!.trim().isNotEmpty)
 										const SizedBox(height: 10),
-									_AttachmentView(attachment: message.attachment!),
+									_AttachmentView(
+										attachment: message.attachment!,
+										onPlay: (message.attachment!.type ==
+													TeamMessageAttachmentType.video ||
+													message.attachment!.type ==
+															TeamMessageAttachmentType.voice)
+											? () => onPlayAttachment(message.attachment!)
+											: null,
+									),
 								],
 							],
 						),
@@ -505,9 +633,10 @@ class _MessageBubble extends StatelessWidget {
 }
 
 class _AttachmentView extends StatelessWidget {
-	const _AttachmentView({required this.attachment});
+	const _AttachmentView({required this.attachment, required this.onPlay});
 
 	final TeamMessageAttachment attachment;
+	final VoidCallback? onPlay;
 
 	@override
 	Widget build(BuildContext context) {
@@ -526,10 +655,18 @@ class _AttachmentView extends StatelessWidget {
 					),
 				);
 			case TeamMessageAttachmentType.video:
-				return _FileLikeAttachment(
-					icon: Icons.videocam_rounded,
-					label: attachment.fileName,
-					outline: outline,
+				return InkWell(
+					onTap: onPlay,
+					borderRadius: BorderRadius.circular(14),
+					child: _FileLikeAttachment(
+						icon: Icons.videocam_rounded,
+						label: attachment.fileName,
+						outline: outline,
+						trailing: Icon(
+							Icons.play_circle_fill_rounded,
+							color: theme.colorScheme.primary,
+						),
+					),
 				);
 			case TeamMessageAttachmentType.file:
 				return _FileLikeAttachment(
@@ -540,12 +677,20 @@ class _AttachmentView extends StatelessWidget {
 			case TeamMessageAttachmentType.voice:
 				final duration = attachment.durationMs ?? 0;
 				final seconds = (duration / 1000).round();
-				return _FileLikeAttachment(
-					icon: Icons.mic_rounded,
-					label: seconds > 0
-							? 'Voice message • 0:${seconds.toString().padLeft(2, '0')}'
-							: 'Voice message',
-					outline: outline,
+				return InkWell(
+					onTap: onPlay,
+					borderRadius: BorderRadius.circular(14),
+					child: _FileLikeAttachment(
+						icon: Icons.mic_rounded,
+						label: seconds > 0
+								? 'Voice message • 0:${seconds.toString().padLeft(2, '0')}'
+								: 'Voice message',
+						outline: outline,
+						trailing: Icon(
+							Icons.play_circle_fill_rounded,
+							color: theme.colorScheme.primary,
+						),
+					),
 				);
 		}
 	}
@@ -556,11 +701,13 @@ class _FileLikeAttachment extends StatelessWidget {
 		required this.icon,
 		required this.label,
 		required this.outline,
+		this.trailing,
 	});
 
 	final IconData icon;
 	final String label;
 	final Color outline;
+	final Widget? trailing;
 
 	@override
 	Widget build(BuildContext context) {
@@ -587,7 +734,231 @@ class _FileLikeAttachment extends StatelessWidget {
 							),
 						),
 					),
+					if (trailing != null) ...[
+						const SizedBox(width: 10),
+						trailing!,
+					],
 				],
+			),
+		);
+	}
+}
+
+class _AudioPlayerSheet extends StatefulWidget {
+	const _AudioPlayerSheet({required this.uri});
+
+	final Uri uri;
+
+	@override
+	State<_AudioPlayerSheet> createState() => _AudioPlayerSheetState();
+}
+
+class _AudioPlayerSheetState extends State<_AudioPlayerSheet> {
+	final AudioPlayer _player = AudioPlayer();
+	bool _loading = true;
+
+	@override
+	void initState() {
+		super.initState();
+		unawaited(_init());
+	}
+
+	Future<void> _init() async {
+		try {
+			await _player.setAudioSource(AudioSource.uri(widget.uri));
+		} finally {
+			if (!mounted) return;
+			setState(() => _loading = false);
+		}
+	}
+
+	@override
+	void dispose() {
+		_player.dispose();
+		super.dispose();
+	}
+
+	@override
+	Widget build(BuildContext context) {
+		final theme = Theme.of(context);
+		return SafeArea(
+			child: Padding(
+				padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+				child: Column(
+					mainAxisSize: MainAxisSize.min,
+					crossAxisAlignment: CrossAxisAlignment.start,
+					children: [
+						Text(
+							'Voice message',
+							style: theme.textTheme.titleMedium?.copyWith(
+								fontWeight: FontWeight.w900,
+							),
+						),
+						const SizedBox(height: 12),
+						if (_loading)
+							const Padding(
+								padding: EdgeInsets.symmetric(vertical: 12),
+								child: Center(child: CircularProgressIndicator()),
+							)
+						else
+							Row(
+								children: [
+									StreamBuilder<PlayerState>(
+										stream: _player.playerStateStream,
+										builder: (context, snap) {
+											final playing = snap.data?.playing ?? false;
+											final processing = snap.data?.processingState;
+											final ended = processing == ProcessingState.completed;
+											return IconButton.filled(
+												onPressed: () async {
+												if (ended) {
+													await _player.seek(Duration.zero);
+													await _player.play();
+													return;
+												}
+												if (playing) {
+													await _player.pause();
+												} else {
+													await _player.play();
+												}
+											},
+											icon: Icon(
+												playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+											),
+										);
+									},
+									),
+									const SizedBox(width: 12),
+									Expanded(
+										child: StreamBuilder<Duration>(
+											stream: _player.positionStream,
+											builder: (context, snap) {
+												final pos = snap.data ?? Duration.zero;
+												String two(int n) => n.toString().padLeft(2, '0');
+												final mm = two(pos.inMinutes.remainder(60));
+												final ss = two(pos.inSeconds.remainder(60));
+												return Text(
+												'$mm:$ss',
+												style: theme.textTheme.bodySmall?.copyWith(
+													fontWeight: FontWeight.w900,
+													color:
+														theme.colorScheme.onSurface.withAlpha(170),
+												),
+											);
+										},
+									),
+								),
+								],
+							),
+					],
+				),
+			),
+		);
+	}
+}
+
+class _VideoPlayerSheet extends StatefulWidget {
+	const _VideoPlayerSheet({required this.uri});
+
+	final Uri uri;
+
+	@override
+	State<_VideoPlayerSheet> createState() => _VideoPlayerSheetState();
+}
+
+class _VideoPlayerSheetState extends State<_VideoPlayerSheet> {
+	late final VideoPlayerController _controller;
+	bool _loading = true;
+
+	@override
+	void initState() {
+		super.initState();
+		_controller = createVideoController(widget.uri);
+		unawaited(_init());
+	}
+
+	Future<void> _init() async {
+		try {
+			await _controller.initialize();
+		} finally {
+			if (!mounted) return;
+			setState(() => _loading = false);
+		}
+	}
+
+	@override
+	void dispose() {
+		_controller.dispose();
+		super.dispose();
+	}
+
+	@override
+	Widget build(BuildContext context) {
+		final theme = Theme.of(context);
+		final outline = theme.colorScheme.outline.withAlpha(102);
+
+		return SafeArea(
+			child: Padding(
+				padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+				child: Column(
+					mainAxisSize: MainAxisSize.min,
+					crossAxisAlignment: CrossAxisAlignment.start,
+					children: [
+						Text(
+							'Video',
+							style: theme.textTheme.titleMedium?.copyWith(
+								fontWeight: FontWeight.w900,
+							),
+						),
+						const SizedBox(height: 12),
+						DecoratedBox(
+							decoration: BoxDecoration(
+								borderRadius: BorderRadius.circular(16),
+								border: Border.all(color: outline),
+								color: theme.colorScheme.surface,
+							),
+							child: ClipRRect(
+								borderRadius: BorderRadius.circular(16),
+								child: AspectRatio(
+									aspectRatio:
+										_loading ? (16 / 9) : _controller.value.aspectRatio,
+									child: Stack(
+										alignment: Alignment.center,
+										children: [
+											if (_loading)
+												const Center(child: CircularProgressIndicator())
+											else
+												VideoPlayer(_controller),
+											if (!_loading)
+												ValueListenableBuilder<VideoPlayerValue>(
+													valueListenable: _controller,
+													builder: (context, value, _) {
+														final isPlaying = value.isPlaying;
+														return IconButton.filled(
+														onPressed: () async {
+															if (isPlaying) {
+																await _controller.pause();
+															} else {
+																await _controller.play();
+															}
+															if (!mounted) return;
+															setState(() {});
+														},
+														icon: Icon(
+															isPlaying
+																? Icons.pause_rounded
+																: Icons.play_arrow_rounded,
+														),
+													);
+													},
+												)
+										],
+									),
+								),
+							),
+						),
+					],
+				),
 			),
 		);
 	}
