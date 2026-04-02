@@ -14,6 +14,7 @@ import '../screens/mr_management/mr_details_screen.dart';
 import '../screens/mr_management/mr_management_screen.dart';
 import '../screens/mr_management/onboard_edit_mr_screen.dart';
 import '../screens/profile/profile_screen.dart';
+import '../screens/attendance/attendance_management_screen.dart';
 import '../screens/team_management/create_edit_team_screen.dart';
 import '../screens/team_management/team_chat_room_screen.dart';
 import '../screens/team_management/team_details_screen.dart';
@@ -52,6 +53,8 @@ sealed class AppRoutes {
   static const teamDetails = 'teamDetails';
   static const teamChatRoom = 'teamChatRoom';
 
+  static const attendanceManagement = 'attendanceManagement';
+
   static const splashPath = '/';
   static const loginPath = '/login';
   static const signupPath = '/signup';
@@ -79,6 +82,8 @@ sealed class AppRoutes {
   static const teamDetailsPath = ':teamId';
   static const editTeamPath = 'edit';
   static const teamChatRoomPath = 'chat';
+
+  static const attendanceManagementPath = '/attendance-records';
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -217,6 +222,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: AppRoutes.attendanceManagementPath,
+        name: AppRoutes.attendanceManagement,
+        builder: (context, state) => const AttendanceManagementScreen(),
       ),
       GoRoute(
         path: AppRoutes.termsConditionsPath,

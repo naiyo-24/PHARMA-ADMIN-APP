@@ -269,15 +269,16 @@ class SideNavBarDrawer extends StatelessWidget {
         return AppRoutes.teamManagement;
       case SideNavDestination.visualAdsManagement:
         return AppRoutes.visualAdsManagement;
+      case SideNavDestination.attendanceRecords:
+        return AppRoutes.attendanceManagement;
       case SideNavDestination.profile:
         return AppRoutes.profile;
       case SideNavDestination.aboutUs:
         return AppRoutes.aboutUs;
       case SideNavDestination.monthlyTargets:
-        
+        return null;
       case SideNavDestination.termsconditions:
         return AppRoutes.termsConditions;
-      case SideNavDestination.attendanceRecords:
       case SideNavDestination.dcr:
       case SideNavDestination.tripPlanManagement:
       case SideNavDestination.orderManagement:
