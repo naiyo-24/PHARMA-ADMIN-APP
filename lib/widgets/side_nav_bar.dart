@@ -292,12 +292,13 @@ class SideNavBarDrawer extends StatelessWidget {
       case SideNavDestination.tripPlanManagement:
       case SideNavDestination.orderManagement:
       case SideNavDestination.distributorManagement:
-      case SideNavDestination.chemistShopManagement:
       case SideNavDestination.helpCenter:
       case SideNavDestination.privacyPolicy:
         return null;
       case SideNavDestination.salarySlipManagement:
         return AppRoutes.salarySlipManagement;
+      case SideNavDestination.chemistShopManagement:
+        return AppRoutes.chemistShopManagement;
     }
   }
 }
