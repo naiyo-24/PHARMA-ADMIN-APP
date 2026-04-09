@@ -31,6 +31,9 @@ import '../screens/chemist_shop/chemist_shop_screen.dart';
 import '../screens/distributor/add_edit_distributor_screen.dart';
 import '../screens/distributor/distributor_detail_screen.dart';
 import '../screens/distributor/distributor_screen.dart';
+import '../screens/doctor/add_edit_doctor_screen.dart';
+import '../screens/doctor/doctor_detail_screen.dart';
+import '../screens/doctor/doctor_screen.dart';
 
 sealed class AppRoutes {
   static const splash = 'splash';
@@ -77,6 +80,11 @@ sealed class AppRoutes {
   static const createDistributor = 'createDistributor';
   static const editDistributor = 'editDistributor';
 
+  static const doctorManagement = 'doctorManagement';
+  static const doctorDetails = 'doctorDetails';
+  static const createDoctor = 'createDoctor';
+  static const editDoctor = 'editDoctor';
+
   static const splashPath = '/';
   static const loginPath = '/login';
   static const signupPath = '/signup';
@@ -120,6 +128,11 @@ sealed class AppRoutes {
   static const distributorDetailsPath = ':distributorId';
   static const createDistributorPath = 'create';
   static const editDistributorPath = 'edit';
+
+  static const doctorManagementPath = '/doctors';
+  static const doctorDetailsPath = ':doctorId';
+  static const createDoctorPath = 'create';
+  static const editDoctorPath = 'edit';
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -265,6 +278,36 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const AttendanceManagementScreen(),
       ),
       GoRoute(
+        path: AppRoutes.doctorManagementPath,
+        name: AppRoutes.doctorManagement,
+        builder: (context, state) => const DoctorScreen(),
+        routes: [
+          GoRoute(
+            path: AppRoutes.createDoctorPath,
+            name: AppRoutes.createDoctor,
+            builder: (context, state) => const AddEditDoctorScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.doctorDetailsPath,
+            name: AppRoutes.doctorDetails,
+            builder: (context, state) {
+              final doctorId = state.pathParameters['doctorId'] ?? '';
+              return DoctorDetailScreen(doctorId: doctorId);
+            },
+            routes: [
+              GoRoute(
+                path: AppRoutes.editDoctorPath,
+                name: AppRoutes.editDoctor,
+                builder: (context, state) {
+                  final doctorId = state.pathParameters['doctorId'] ?? '';
+                  return AddEditDoctorScreen(doctorId: doctorId);
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+      GoRoute(
         path: AppRoutes.announcementManagementPath,
         name: AppRoutes.announcementManagement,
         builder: (context, state) => const AnnouncementManagementScreen(),
@@ -331,9 +374,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) {
                   final distributorId =
                       state.pathParameters['distributorId'] ?? '';
-                  return AddEditDistributorScreen(
-                    distributorId: distributorId,
-                  );
+                  return AddEditDistributorScreen(distributorId: distributorId);
                 },
               ),
             ],

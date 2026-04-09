@@ -10,6 +10,7 @@ enum SideNavDestination {
   teamManagement,
   visualAdsManagement,
   attendanceRecords,
+  doctorManagement,
   dcr,
   tripPlanManagement,
   orderManagement,
@@ -40,6 +41,8 @@ extension SideNavDestinationX on SideNavDestination {
         return 'Visual Ads Management';
       case SideNavDestination.attendanceRecords:
         return 'Attendance Records';
+      case SideNavDestination.doctorManagement:
+        return 'Doctor Management';
       case SideNavDestination.dcr:
         return 'DCR Management';
       case SideNavDestination.tripPlanManagement:
@@ -83,6 +86,8 @@ extension SideNavDestinationX on SideNavDestination {
         return Icons.view_carousel_rounded;
       case SideNavDestination.attendanceRecords:
         return Icons.event_available_rounded;
+      case SideNavDestination.doctorManagement:
+        return Icons.medical_services_rounded;
       case SideNavDestination.dcr:
         return Icons.description_rounded;
       case SideNavDestination.tripPlanManagement:
@@ -150,6 +155,7 @@ class SideNavBarDrawer extends StatelessWidget {
     SideNavDestination.teamManagement,
     SideNavDestination.visualAdsManagement,
     SideNavDestination.attendanceRecords,
+    SideNavDestination.doctorManagement,
     SideNavDestination.dcr,
     SideNavDestination.tripPlanManagement,
     SideNavDestination.orderManagement,
@@ -288,6 +294,8 @@ class SideNavBarDrawer extends StatelessWidget {
         return null;
       case SideNavDestination.termsconditions:
         return AppRoutes.termsConditions;
+      case SideNavDestination.doctorManagement:
+        return AppRoutes.doctorManagement;
       case SideNavDestination.dcr:
       case SideNavDestination.tripPlanManagement:
       case SideNavDestination.orderManagement:
@@ -303,7 +311,6 @@ class SideNavBarDrawer extends StatelessWidget {
     }
   }
 }
-
 
 class _SideNavHeader extends StatelessWidget {
   const _SideNavHeader({
