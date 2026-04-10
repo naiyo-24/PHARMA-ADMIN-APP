@@ -295,6 +295,7 @@ class SideNavBarDrawer extends StatelessWidget {
       case SideNavDestination.termsconditions:
         return AppRoutes.termsConditions;
       case SideNavDestination.dcr:
+		return AppRoutes.dcrManagement;
       case SideNavDestination.tripPlanManagement:
       case SideNavDestination.orderManagement:
       case SideNavDestination.helpCenter:

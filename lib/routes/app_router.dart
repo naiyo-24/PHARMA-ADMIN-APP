@@ -34,6 +34,7 @@ import '../screens/distributor/distributor_screen.dart';
 import '../screens/doctor/add_edit_doctor_screen.dart';
 import '../screens/doctor/doctor_detail_screen.dart';
 import '../screens/doctor/doctor_screen.dart';
+import '../screens/dcr/dcr_screen.dart';
 
 sealed class AppRoutes {
   static const splash = 'splash';
@@ -85,6 +86,8 @@ sealed class AppRoutes {
 	static const createDoctor = 'createDoctor';
 	static const editDoctor = 'editDoctor';
 
+  static const dcrManagement = 'dcrManagement';
+
   static const splashPath = '/';
   static const loginPath = '/login';
   static const signupPath = '/signup';
@@ -133,6 +136,8 @@ sealed class AppRoutes {
 	static const doctorDetailsPath = ':doctorId';
 	static const createDoctorPath = 'create';
 	static const editDoctorPath = 'edit';
+
+  static const dcrManagementPath = '/dcr';
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -383,6 +388,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
+			GoRoute(
+				path: AppRoutes.dcrManagementPath,
+				name: AppRoutes.dcrManagement,
+				builder: (context, state) => const DcrScreen(),
+			),
       GoRoute(
         path: AppRoutes.termsConditionsPath,
         name: AppRoutes.termsConditions,
