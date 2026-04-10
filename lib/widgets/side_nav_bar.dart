@@ -295,15 +295,16 @@ class SideNavBarDrawer extends StatelessWidget {
       case SideNavDestination.termsconditions:
         return AppRoutes.termsConditions;
       case SideNavDestination.dcr:
-		return AppRoutes.dcrManagement;
+        return AppRoutes.dcrManagement;
       case SideNavDestination.tripPlanManagement:
-  		return AppRoutes.tripPlanManagement;
+        return AppRoutes.tripPlanManagement;
       case SideNavDestination.orderManagement:
+        return AppRoutes.orderManagement;
       case SideNavDestination.helpCenter:
       case SideNavDestination.privacyPolicy:
         return null;
       case SideNavDestination.doctorManagement:
-			return AppRoutes.doctorManagement;
+        return AppRoutes.doctorManagement;
       case SideNavDestination.distributorManagement:
         return AppRoutes.distributorManagement;
       case SideNavDestination.salarySlipManagement:
@@ -313,7 +314,6 @@ class SideNavBarDrawer extends StatelessWidget {
     }
   }
 }
-
 
 class _SideNavHeader extends StatelessWidget {
   const _SideNavHeader({

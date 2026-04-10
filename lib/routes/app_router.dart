@@ -37,6 +37,8 @@ import '../screens/doctor/add_edit_doctor_screen.dart';
 import '../screens/doctor/doctor_detail_screen.dart';
 import '../screens/doctor/doctor_screen.dart';
 import '../screens/dcr/dcr_screen.dart';
+import '../screens/order/create_edit_order_screen.dart';
+import '../screens/order/order_screen.dart';
 
 import '../models/trip_plan.dart';
 
@@ -85,12 +87,16 @@ sealed class AppRoutes {
   static const createDistributor = 'createDistributor';
   static const editDistributor = 'editDistributor';
 
-	static const doctorManagement = 'doctorManagement';
-	static const doctorDetails = 'doctorDetails';
-	static const createDoctor = 'createDoctor';
-	static const editDoctor = 'editDoctor';
+  static const doctorManagement = 'doctorManagement';
+  static const doctorDetails = 'doctorDetails';
+  static const createDoctor = 'createDoctor';
+  static const editDoctor = 'editDoctor';
 
   static const dcrManagement = 'dcrManagement';
+
+  static const orderManagement = 'orderManagement';
+  static const createOrder = 'createOrder';
+  static const editOrder = 'editOrder';
 
   static const tripPlanManagement = 'tripPlanManagement';
   static const tripPlanEditor = 'tripPlanEditor';
@@ -139,12 +145,16 @@ sealed class AppRoutes {
   static const createDistributorPath = 'create';
   static const editDistributorPath = 'edit';
 
-	static const doctorManagementPath = '/doctors';
-	static const doctorDetailsPath = ':doctorId';
-	static const createDoctorPath = 'create';
-	static const editDoctorPath = 'edit';
+  static const doctorManagementPath = '/doctors';
+  static const doctorDetailsPath = ':doctorId';
+  static const createDoctorPath = 'create';
+  static const editDoctorPath = 'edit';
 
   static const dcrManagementPath = '/dcr';
+
+  static const orderManagementPath = '/orders';
+  static const createOrderPath = 'create';
+  static const editOrderPath = ':orderId/edit';
 
   static const tripPlanManagementPath = '/trip-plans';
   static const tripPlanEditorPath = ':subjectType/:subjectId';
@@ -359,9 +369,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) {
                   final distributorId =
                       state.pathParameters['distributorId'] ?? '';
-                  return AddEditDistributorScreen(
-                    distributorId: distributorId,
-                  );
+                  return AddEditDistributorScreen(distributorId: distributorId);
                 },
               ),
             ],
@@ -398,11 +406,31 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-			GoRoute(
-				path: AppRoutes.dcrManagementPath,
-				name: AppRoutes.dcrManagement,
-				builder: (context, state) => const DcrScreen(),
-			),
+      GoRoute(
+        path: AppRoutes.dcrManagementPath,
+        name: AppRoutes.dcrManagement,
+        builder: (context, state) => const DcrScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.orderManagementPath,
+        name: AppRoutes.orderManagement,
+        builder: (context, state) => const OrderScreen(),
+        routes: [
+          GoRoute(
+            path: AppRoutes.createOrderPath,
+            name: AppRoutes.createOrder,
+            builder: (context, state) => const CreateEditOrderScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.editOrderPath,
+            name: AppRoutes.editOrder,
+            builder: (context, state) {
+              final orderId = state.pathParameters['orderId'] ?? '';
+              return CreateEditOrderScreen(orderId: orderId);
+            },
+          ),
+        ],
+      ),
       GoRoute(
         path: AppRoutes.tripPlanManagementPath,
         name: AppRoutes.tripPlanManagement,
@@ -412,7 +440,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: AppRoutes.tripPlanEditorPath,
             name: AppRoutes.tripPlanEditor,
             builder: (context, state) {
-              final rawType = (state.pathParameters['subjectType'] ?? '').trim().toLowerCase();
+              final rawType = (state.pathParameters['subjectType'] ?? '')
+                  .trim()
+                  .toLowerCase();
               final subjectType = rawType == 'asm'
                   ? TripPlanSubjectType.asm
                   : TripPlanSubjectType.mr;
