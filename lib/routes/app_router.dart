@@ -26,6 +26,8 @@ import '../screens/visual_ads/create_edit_visual_ads_screen.dart';
 import '../screens/visual_ads/visual_ad_preview_screen.dart';
 import '../screens/visual_ads/visual_ads_management_screen.dart';
 import '../screens/salary_slip/salary_slip_screen.dart';
+import '../screens/payment/plan_history_screen.dart';
+import '../screens/payment/plan_screen.dart';
 import '../screens/chemist_shop/chemist_shop_detail_screen.dart';
 import '../screens/chemist_shop/chemist_shop_screen.dart';
 import '../screens/distributor/add_edit_distributor_screen.dart';
@@ -78,6 +80,9 @@ sealed class AppRoutes {
   static const editAnnouncement = 'editAnnouncement';
 
   static const salarySlipManagement = 'salarySlipManagement';
+
+  static const planHistory = 'planHistory';
+  static const planCatalog = 'planCatalog';
 
   static const chemistShopManagement = 'chemistShopManagement';
   static const chemistShopDetails = 'chemistShopDetails';
@@ -136,6 +141,9 @@ sealed class AppRoutes {
   static const editAnnouncementPath = ':announcementId/edit';
 
   static const salarySlipManagementPath = '/salary-slips';
+
+  static const planHistoryPath = '/plan-history';
+  static const planCatalogPath = '/plans';
 
   static const chemistShopManagementPath = '/chemist-shops';
   static const chemistShopDetailsPath = ':shopId';
@@ -329,6 +337,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.salarySlipManagementPath,
         name: AppRoutes.salarySlipManagement,
         builder: (context, state) => const SalarySlipScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.planHistoryPath,
+        name: AppRoutes.planHistory,
+        builder: (context, state) => const PlanHistoryScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.planCatalogPath,
+        name: AppRoutes.planCatalog,
+        builder: (context, state) => const PlanScreen(),
       ),
       GoRoute(
         path: AppRoutes.chemistShopManagementPath,

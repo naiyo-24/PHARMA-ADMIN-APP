@@ -55,7 +55,7 @@ class ProfileScreen extends ConsumerWidget {
                       ProfileOptionCard(
                         title: 'My subscription',
                         icon: Icons.workspace_premium_rounded,
-                        onTap: null,
+                        onTap: () => context.pushNamed(AppRoutes.planHistory),
                       ),
                       const SizedBox(height: 12),
                       ProfileOptionCard(
